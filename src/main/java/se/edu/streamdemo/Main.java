@@ -6,6 +6,8 @@ import se.edu.streamdemo.task.Task;
 
 import java.util.ArrayList;
 
+import static java.util.stream.Collectors.toList;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -20,10 +22,16 @@ public class Main {
 
         System.out.println("Printing deadlines ...");
         printDeadlines(tasksData);
-        printAllDeadLinesUsingStreams(tasksData);
+
 
         System.out.println("Total number of deadlines: " + countDeadlines(tasksData));
+
+
+        ArrayList<Task> filteredList = filterTaskByString(tasksData, "10");
+        printAllData(filteredList);
+        
         System.out.println("Total number of deadlines (Using Streams): " + countDeadlinesUsingStreams(tasksData));
+
     }
 
     private static int countDeadlines(ArrayList<Task> tasksData) {
@@ -64,13 +72,17 @@ public class Main {
         }
     }
 
-    // Using Parallel Stream or Normal Stream works either - Parallel just means Multiple Streams works
-    public static void printAllDeadLinesUsingStreams(ArrayList<Task> tasks){
-        System.out.println("Using Streams...");
-        tasks.parallelStream()
+    public static void printDeadlinesUsingStreams(ArrayList<Task> tasks) {
+        tasks.stream()
                 .filter(t -> t instanceof Deadline)
+                .sorted((t1, t2) -> t1.getDescription().compareToIgnoreCase(t2.getDescription()))
                 .forEach(System.out::println);
-
     }
 
+    public static ArrayList<Task> filterTaskByString(ArrayList<Task> tasks, String filterString) {
+        ArrayList<Task> filteredList = (ArrayList<Task>) tasks.stream()
+                .filter(t -> t.getDescription().contains(filterString))
+                .collect(toList());
+        return filteredList;
+    }
 }
